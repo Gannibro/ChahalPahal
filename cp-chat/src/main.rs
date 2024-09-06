@@ -13,7 +13,7 @@ use actix_web::{web, http, App, HttpServer};
 //httpserver: actual server that will run the app
 
 use diesel::{
-    prelude::*,    //imports traits and types to interact with databasection pooling library, efficiently manage database connections in web application
+    prelude::*,    //imports types to interact with databasection pooling library, efficiently manage database connections in web application
     r2d2::{self, ConnectionManager}, 
 };
 //self means current module that you want to bring into the scope
