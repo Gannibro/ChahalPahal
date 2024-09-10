@@ -26,3 +26,26 @@ use crate::server;     //handles server logic
 use crate::session;     //handles session management
 type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;     //defines alias DbPool; makes easier to manage multiple SQLite connections
 
+pub async fn index() -> impl Responder {     //asynchronously opens files at "./static/index.html"
+  NamedFile::open_async("./static/index.html").await.unwrap()     //if successful, returns the file as HTTP response to client
+}
+
+pub async fn chat_server(     //asynchronous function, makes handling WebSocket connections and DB operations easier
+  req: HttpRequest,     //provides information like headers, query parameters, etc
+  stream: web::Payload,     //represents incoming mesages or data that server recieves
+  pool: web::Data<DbPool>,     //allows function to interact with database through Diesel
+  srv: web::Data<Addr<server::ChatServer>>,     //manages chat server's state and communication between clients
+) -> Result<HttpResponse, Error> {     //returns result that contains HTTPResonse or Error
+  ws::start(     //start WebSocket session
+      session::WsChatSession {     //defines data and behavior of the chat session
+          id: 0,     //starts with ID 0
+          hb: Instant::now(),     //stands for heartbeatl used to track last time server sent/recieved message
+          room: "main".to_string(),     //initial chat room
+          name: None,
+          addr: srv.get_ref().clone(),     //referrence to chat server actor, retreives referrence to ChatServer
+          db_pool: pool,     //referrence to database connection, passed to sesion
+      },
+      &req,     //passes HTTP request that initiated WebSocket connection
+      stream     //passes WebSocket stream that carries WebSocket messages
+  )
+}
