@@ -17,3 +17,12 @@ use diesel::{
     //self means current module that you want to bring into the scope
     //ConnectionManager is struct used to manage DB connection in Diesel
 };
+
+use serde_json::json;     //imports json! macro from json crate; helps to create JSON values
+use uuid::Uuid;     //imports uuid from the uuid crate; helps in uniquely identification of information
+use crate::db;     //imports db module from current crate, helps to connect run or handle database
+use crate::models;     //handles data models
+use crate::server;     //handles server logic
+use crate::session;     //handles session management
+type DbPool = r2d2::Pool<ConnectionManager<SqliteConnection>>;     //defines alias DbPool; makes easier to manage multiple SQLite connections
+
